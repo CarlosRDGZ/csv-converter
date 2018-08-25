@@ -25,7 +25,7 @@
         <div class="column is-10-desktop is-10-tablet is-12-mobile">
           <div class="field is-grouped">
             <div class="control">
-              <div class="file has-name">
+              <div id="file-selector" class="file has-name">
                 <label class="file-label">
                   <input class="file-input" type="file" id="file">
                   <span class="file-cta">
@@ -37,6 +37,7 @@
                   <span class="file-name">No archivo seleccionado</span>
                 </label>
               </div>
+              <p id="file-error" class="help is-danger" style="display: none">Formato no valido</p>
             </div>
             <div class="control">
               <label class="checkbox">

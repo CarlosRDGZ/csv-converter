@@ -1,6 +1,8 @@
 window.data = '';
 window.csv = null;
 window.csvDisplay = '';
+const fileSelector = document.querySelector('#file-selector');
+const fileError = document.querySelector('#file-error');
 
 class CSV {
     constructor(str, hasHeader) {
@@ -130,20 +132,28 @@ function test(str) {
 
 document.getElementById('file').addEventListener('change', function (ev) {
     const file = ev.target.files[0];
+    if (/\.csv$/.test(file.name)) {
+        /* file error message */
+        fileSelector.classList.remove('is-danger');
+        fileError.style.display = 'none';
 
-    document.querySelector('.file-name').textContent = file.name;
-
-    const reader = new FileReader();
-    reader.onload = function () {
-        window.data = reader.result;
-        window.csv = new CSV(reader.result);
-        document.querySelector('#raw').firstChild.textContent = window.csv.data;
-        window.csv.toHTMLTable().then(html => {
-            document.querySelector('#table').innerHTML = html;
-        });
-    };
-
-    reader.readAsText(file);
+        document.querySelector('.file-name').textContent = file.name;
+    
+        const reader = new FileReader();
+        reader.onload = function () {
+            window.data = reader.result;
+            window.csv = new CSV(reader.result);
+            document.querySelector('#raw').firstChild.textContent = window.csv.data;
+            window.csv.toHTMLTable().then(html => {
+                document.querySelector('#table').innerHTML = html;
+            });
+        };
+    
+        reader.readAsText(file);
+    } else {
+        fileSelector.classList.add('is-danger');
+        fileError.style.display = '';    
+    }
 });
 
 document.querySelectorAll('.tab-csv').forEach(e => {
