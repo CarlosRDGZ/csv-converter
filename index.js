@@ -1,10 +1,37 @@
 window.data = '';
+window.csv = null;
+window.csvDisplay = '';
 
 class CSV {
     constructor(str, hasHeader) {
         this.data = str;
         this.hasHeader = hasHeader | true;
         this.currentIndex = 0;
+        this.dataStartIndex = undefined;
+    }
+
+    fields() {
+        const self = this;
+        self.currentIndex = 0;
+        return new Promise((resolve, reject) => {
+            try {
+                const props = self._readRow();
+                self.dataStartIndex = self.currentIndex;
+                resolve (props);
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
+    get matrix() {
+        const data = [];
+        this.currentIndex = this.dataStartIndex;
+        while (this.data[this.currentIndex] !== undefined) {
+            const row = this._readRow();
+            data.push(row);
+        }
+        return data;
     }
 
     toJSON() {
@@ -12,7 +39,7 @@ class CSV {
         return new Promise((resolve, reject) => {
             if (self.data.length > 0) {
                 if (self.hasHeader) {
-                    self._getProps().then(function (props) {
+                    self.fields().then(function (props) {
                         const objects = [];
                         const length = props.length;
                         while (self.data[self.currentIndex] !== undefined) {
@@ -33,15 +60,22 @@ class CSV {
         });
     }
 
-    _getProps() {
+    toHTMLTable () {
         const self = this;
-        return new Promise((resolve, reject) => {
-            try {
-                const props = self._readRow();
-                resolve (props);
-            } catch (err) {
-                reject(err);
-            }
+        return new Promise(function(resolve, reject) {
+            self.fields().then(fields => {
+                resolve(`
+                <table class="table is-striped is-fullwidth">
+                    <thead>
+                        <tr>
+                        ${fields.map(field => '<th>' + field + '</th>').join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${self.matrix.map(row => '<tr>' + row.map(value => '<td>' + value + '</td>').join('') + '</tr>').join('')}
+                    </tbody>
+                </table>`);
+            });
         });
     }
 
@@ -102,7 +136,27 @@ document.getElementById('file').addEventListener('change', function (ev) {
     const reader = new FileReader();
     reader.onload = function () {
         window.data = reader.result;
+        window.csv = new CSV(reader.result);
+        document.querySelector('#raw').firstChild.textContent = window.csv.data;
+        window.csv.toHTMLTable().then(html => {
+            document.querySelector('#table').innerHTML = html;
+        });
     };
 
     reader.readAsText(file);
+});
+
+document.querySelectorAll('.tab-csv').forEach(e => {
+    e.addEventListener('click', (ev) => {
+        const tab = ev.currentTarget;
+        if (window.csvDisplay !== tab.dataset.tab) {
+            document.querySelector(`#${tab.dataset.tab}`).style.display = '';
+            if (window.csvDisplay) {
+                document.querySelector(`#${window.csvDisplay}`).style.display = 'none';
+                document.querySelector(`.tab-csv[data-tab="${window.csvDisplay}"]`).classList.remove('is-active');
+            }
+            tab.classList.add('is-active');
+            window.csvDisplay = tab.dataset.tab;
+        }
+    });
 });

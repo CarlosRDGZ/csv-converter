@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
+  <title>Convertidor</title>
   <link rel="stylesheet" href="bulma.css">
   <link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.css">
 </head>
@@ -22,24 +22,38 @@
   <main class="section">
     <div class="container">
       <div class="columns is-centered is-multiline">
-        <div class="column is-12">
-          <div class="file has-name">
-            <label class="file-label">
-              <input class="file-input" type="file" id="file">
-              <span class="file-cta">
-                <span class="file-icon">
-                  <i class="fa fa-upload"></i>
-                </span>
-                <!-- <span class="file-label"></span> -->
-              </span>
-              <span class="file-name">No archivo seleccionado</span>
-            </label>
+        <div class="column is-10-desktop is-10-tablet is-12-mobile">
+          <div class="field is-grouped">
+            <div class="control">
+              <div class="file has-name">
+                <label class="file-label">
+                  <input class="file-input" type="file" id="file">
+                  <span class="file-cta">
+                    <span class="file-icon">
+                      <i class="fa fa-upload"></i>
+                    </span>
+                    <!-- <span class="file-label"></span> -->
+                  </span>
+                  <span class="file-name">No archivo seleccionado</span>
+                </label>
+              </div>
+            </div>
+            <div class="control">
+              <label class="checkbox">
+                <input id="has-header" type="checkbox"> Tiene Encabezado
+              </label>
+            </div>
           </div>
         </div>
         <div class="column is-5-desktop is-10-tablet is-12-mobile">
-          <div id="csv" class="content">
-            <pre></pre>
+          <div class="tabs is-centered">
+            <ul>
+              <li class="tab-csv" data-tab="table"><a>Tabla</a></li>
+              <li class="tab-csv" data-tab="raw"><a>Raw</a></li>
+            </ul>
           </div>
+          <div id="table" style="display: none"></div>
+          <div id="raw" style="display: none"><pre></pre></div>
         </div>
         <div class="column is-5-desktop is-10-tablet is-12-mobile">
           <div id="json" class="content">
