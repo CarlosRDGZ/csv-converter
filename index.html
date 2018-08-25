@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="bulma.css">
+  <link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.css">
+</head>
+<body>
+  <section class="hero is-primary">
+    <div class="hero-body has-text-centered">
+      <h class="container">
+        <h1 class="title is-1">
+          Convertidor de archivos CSV
+        </h1>
+        <h2 class="subtitle">Rodr&iacute;guez-Michel</h2>
+      </div>
+    </div>
+  </section>
+  <main class="section">
+    <div class="container">
+      <div class="columns is-centered is-multiline">
+        <div class="column is-12">
+          <div class="file has-name">
+            <label class="file-label">
+              <input class="file-input" type="file" id="file">
+              <span class="file-cta">
+                <span class="file-icon">
+                  <i class="fa fa-upload"></i>
+                </span>
+                <!-- <span class="file-label"></span> -->
+              </span>
+              <span class="file-name">No archivo seleccionado</span>
+            </label>
+          </div>
+        </div>
+        <div class="column is-5-desktop is-10-tablet is-12-mobile">
+          <div id="csv" class="content">
+            <pre></pre>
+          </div>
+        </div>
+        <div class="column is-5-desktop is-10-tablet is-12-mobile">
+          <div id="json" class="content">
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
+<script src="renderjson.js"></script>
+<script src="index.js"></script>
