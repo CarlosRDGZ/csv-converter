@@ -1,8 +1,15 @@
 window.data = '';
 window.csv = null;
-window.csvDisplay = '';
+window.csvDisplay = false;
+window.resultDisplay = false;
 const fileSelector = document.querySelector('#file-selector');
 const fileError = document.querySelector('#file-error');
+const btnDownload = document.querySelector('#btn-download');
+const downloads = {
+    fileName: '',
+    json: '',
+    xml: ''
+};
 
 class CSV {
     constructor(str, hasHeader) {
@@ -41,7 +48,7 @@ class CSV {
         return new Promise((resolve, reject) => {
             if (self.data.length > 0) {
                 if (self.hasHeader) {
-                    self.fields().then(function (props) {
+                    self.fields().then(function(props) {
                         const objects = [];
                         const length = props.length;
                         while (self.data[self.currentIndex] !== undefined) {
@@ -58,6 +65,27 @@ class CSV {
                 }
             } else {
                 reject(Error('not header'));
+            }
+        });
+    }
+
+    toXML() {
+        const self = this;
+        return new Promise(function (resolve, reject) {
+            if (self.data.length > 0) {
+                self.fields().then(function(props) {
+                    resolve('<table>' +
+                        self.matrix.map(row => {
+                            return '<row>' +
+                                row.map((v, i) => {
+                                    return '<' + props[i] + '>' + v + '</' + props[i] + '>';
+                                }).join('') +
+                            '</row>';
+                        }).join('') +
+                    '</table>');
+                });
+            } else {
+                reject(Error('Invalid data'));
             }
         });
     }
@@ -121,32 +149,37 @@ class CSV {
     }
 }
 
-function test(str) {
-    const csv = new CSV(str);
-    csv.toJSON().then(data => {
-        document.getElementById('json').appendChild(renderjson(data));
-    }).catch(err => console.error(err));
-    // console.log(csv.data[csv.currentIndex]);
-    // console.log(csv.currentIndex);
-}
-
 document.getElementById('file').addEventListener('change', function (ev) {
     const file = ev.target.files[0];
     if (/\.csv$/.test(file.name)) {
-        /* file error message */
+        // file error message
         fileSelector.classList.remove('is-danger');
         fileError.style.display = 'none';
 
         document.querySelector('.file-name').textContent = file.name;
+        downloads.fileName = file.name.substr(0, file.name.length - 4);
     
         const reader = new FileReader();
         reader.onload = function () {
             window.data = reader.result;
-            window.csv = new CSV(reader.result);
+            window.csv = new CSV(reader.result, true);
             document.querySelector('#raw').firstChild.textContent = window.csv.data;
+
             window.csv.toHTMLTable().then(html => {
                 document.querySelector('#table').innerHTML = html;
+                return window.csv.toJSON();
+            }).then(json => {
+                document.getElementById('json').appendChild(renderjson(json));
+                downloads.json = 'data:text/json;charset=utf-8,' + JSON.stringify(json);
+                return window.csv.toXML();
+            }).then(xml => {
+                downloads.xml = 'data:text/xml;charset=utf-8,' + xml;
+                document.querySelector('#xml').firstChild.innerHTML = xml;
+                document.querySelector('.tab-csv[data-tab="table"]').click();
+                document.querySelector('.tab-result[data-tab="json"]').click();
             });
+
+            btnDownload.style.display = '';
         };
     
         reader.readAsText(file);
@@ -159,14 +192,35 @@ document.getElementById('file').addEventListener('change', function (ev) {
 document.querySelectorAll('.tab-csv').forEach(e => {
     e.addEventListener('click', (ev) => {
         const tab = ev.currentTarget;
-        if (window.csvDisplay !== tab.dataset.tab) {
-            document.querySelector(`#${tab.dataset.tab}`).style.display = '';
-            if (window.csvDisplay) {
-                document.querySelector(`#${window.csvDisplay}`).style.display = 'none';
-                document.querySelector(`.tab-csv[data-tab="${window.csvDisplay}"]`).classList.remove('is-active');
+        if (window.csv !== null) {
+            if (window.csvDisplay !== tab.dataset.tab) {
+                document.querySelector(`#${tab.dataset.tab}`).style.display = '';
+                if (window.csvDisplay) {
+                    document.querySelector(`#${window.csvDisplay}`).style.display = 'none';
+                    document.querySelector(`.tab-csv[data-tab="${window.csvDisplay}"]`).classList.remove('is-active');
+                }
+                tab.classList.add('is-active');
+                window.csvDisplay = tab.dataset.tab;
             }
-            tab.classList.add('is-active');
-            window.csvDisplay = tab.dataset.tab;
+        }
+    });
+});
+
+document.querySelectorAll('.tab-result').forEach(e => {
+    e.addEventListener('click', (ev) => {
+        const tab = ev.currentTarget;
+        if (window.csv !== null) {
+            if (window.resultDisplay !== tab.dataset.tab) {
+                btnDownload.setAttribute('href', downloads[tab.dataset.tab]);
+                btnDownload.setAttribute('download', downloads.fileName + '.' + tab.dataset.tab);
+                document.querySelector(`#${tab.dataset.tab}`).style.display = '';
+                if (window.resultDisplay) {
+                    document.querySelector(`#${window.resultDisplay}`).style.display = 'none';
+                    document.querySelector(`.tab-result[data-tab="${window.resultDisplay}"]`).classList.remove('is-active');
+                }
+                tab.classList.add('is-active');
+                window.resultDisplay = tab.dataset.tab;
+            }
         }
     });
 });

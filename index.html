@@ -47,7 +47,24 @@
           </div>
         </div>
         <div class="column is-5-desktop is-10-tablet is-12-mobile">
-          <div class="tabs is-centered">
+          <div class="tabs is-centered is-toggle">
+            <ul>
+              <li class="tab-result" data-tab="json"><a>JSON</a></li>
+              <li class="tab-result" data-tab="xml"><a>XML</a></li>
+              <li>
+                <a id="btn-download" href="" class="is-success" style="display: none">
+                  <span class="icon">
+                    <div class="fa fa-download"></div>
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div id="json" style="display: none"></div>
+          <div id="xml" style="display: none"><pre></pre></div>
+        </div>
+        <div class="column is-5-desktop is-10-tablet is-12-mobile">
+          <div class="tabs is-centered is-toggle">
             <ul>
               <li class="tab-csv" data-tab="table"><a>Tabla</a></li>
               <li class="tab-csv" data-tab="raw"><a>Raw</a></li>
@@ -55,10 +72,6 @@
           </div>
           <div id="table" style="display: none"></div>
           <div id="raw" style="display: none"><pre></pre></div>
-        </div>
-        <div class="column is-5-desktop is-10-tablet is-12-mobile">
-          <div id="json" class="content">
-          </div>
         </div>
       </div>
     </div>
