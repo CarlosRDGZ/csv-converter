@@ -103,7 +103,7 @@ class CSV {
         return new Promise(function(resolve, reject) {
             self.fields().then(fields => {
                 resolve(`
-                <table class="table is-striped">
+                <table class="table is-striped is-narrow is-scrollable is-bordered">
                     <thead>
                         <tr>
                         ${fields.map(field => '<th>' + field + '</th>').join('')}

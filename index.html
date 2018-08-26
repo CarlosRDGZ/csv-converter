@@ -7,6 +7,19 @@
   <title>Convertidor</title>
   <link rel="stylesheet" href="bulma.css">
   <link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.css">
+  <style>
+    #raw pre {
+      overflow-y: scroll;
+      max-height: 350px;
+    }
+    .table.is-scrollable tbody {
+      overflow-y: scroll;
+      overflow-x: scroll;
+      max-width: 561px;
+      height: 320px;
+      position: absolute;
+    }
+  </style>
 </head>
 <body>
   <section class="hero is-primary">
@@ -60,8 +73,8 @@
               </li>
             </ul>
           </div>
-          <div id="json" class="tab-content" style="display: none"></div>
-          <div id="xml" class="tab-content" style="display: none"><pre lang="xml"></pre></div>
+          <div id="json" class="tab-content" style="display: none; min-height: 390px"></div>
+          <div id="xml" class="tab-content" style="display: none; min-height: 390px"><pre lang="xml"></pre></div>
         </div>
         <div class="column is-5-desktop is-10-tablet is-12-mobile">
           <div class="tabs is-centered is-toggle">
