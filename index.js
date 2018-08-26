@@ -191,14 +191,14 @@ document.querySelectorAll('.tab-csv').forEach(e => {
     e.addEventListener('click', (ev) => {
         const tab = ev.currentTarget;
         if (csv !== null) {
-            if (let csvDisplay !== tab.dataset.tab) {
+            if (csvDisplay !== tab.dataset.tab) {
                 document.querySelector(`#${tab.dataset.tab}`).style.display = '';
-                if (let csvDisplay) {
-                    document.querySelector(`#${let csvDisplay}`).style.display = 'none';
-                    document.querySelector(`.tab-csv[data-tab="${let csvDisplay}"]`).classList.remove('is-active');
+                if (csvDisplay) {
+                    document.querySelector(`#${csvDisplay}`).style.display = 'none';
+                    document.querySelector(`.tab-csv[data-tab="${csvDisplay}"]`).classList.remove('is-active');
                 }
                 tab.classList.add('is-active');
-                let csvDisplay = tab.dataset.tab;
+                csvDisplay = tab.dataset.tab;
             }
         }
     });
