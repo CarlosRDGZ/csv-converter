@@ -4,6 +4,9 @@ let resultDisplay = false;
 const fileSelector = document.querySelector('#file-selector');
 const fileError = document.querySelector('#file-error');
 const btnDownload = document.querySelector('#btn-download');
+const jsonDisplayer = document.querySelector('#json');
+const csvTabs = document.querySelectorAll('.tab-csv');
+const resultTabs = document.querySelectorAll('.tab-result');
 const downloads = {
     fileName: '',
     json: '',
@@ -13,7 +16,7 @@ const downloads = {
 class CSV {
     constructor(str, hasHeader) {
         this.data = str;
-        this.hasHeader = hasHeader | true;
+        this.hasHeader = hasHeader;
         this.currentIndex = 0;
         this.dataStartIndex = undefined;
     }
@@ -24,8 +27,16 @@ class CSV {
         return new Promise((resolve, reject) => {
             try {
                 const props = self._readRow();
-                self.dataStartIndex = self.currentIndex;
-                resolve (props);
+                if (self.hasHeader) {
+                    self.dataStartIndex = self.currentIndex;
+                    resolve (props);
+                } else {
+                    self.dataStartIndex = self.currentIndex = 0;
+                    const costumeProps = [];
+                    for (let i = 0, length = props.length; i < length; i++)
+                        costumeProps.push(['field ' + (i + 1)]);
+                    resolve(costumeProps);
+                }
             } catch (err) {
                 reject(err);
             }
@@ -46,22 +57,20 @@ class CSV {
         const self = this;
         return new Promise((resolve, reject) => {
             if (self.data.length > 0) {
-                if (self.hasHeader) {
-                    self.fields().then(function(props) {
-                        const objects = [];
-                        const length = props.length;
-                        while (self.data[self.currentIndex] !== undefined) {
-                            const data = self._readRow();
-                            const obj = {};
-                            for (let i = 0; i < length; i++)
-                                obj[props[i]] = data[i];
-                            objects.push(obj);
-                        }
-                        resolve(objects);
-                    }).catch(function (err) {
-                        reject(err);
-                    });
-                }
+                self.fields().then(function(props) {
+                    const objects = [];
+                    const length = props.length;
+                    while (self.data[self.currentIndex] !== undefined) {
+                        const data = self._readRow();
+                        const obj = {};
+                        for (let i = 0; i < length; i++)
+                            obj[props[i]] = data[i];
+                        objects.push(obj);
+                    }
+                    resolve(objects);
+                }).catch(function (err) {
+                    reject(err);
+                });
             } else {
                 reject(Error('not header'));
             }
@@ -160,21 +169,23 @@ document.getElementById('file').addEventListener('change', function (ev) {
     
         const reader = new FileReader();
         reader.onload = function () {
-            csv = new CSV(reader.result, true);
+            csv = new CSV(reader.result, document.querySelector('#has-header').checked);
             document.querySelector('#raw').firstChild.textContent = csv.data;
 
             csv.toHTMLTable().then(html => {
                 document.querySelector('#table').innerHTML = html;
                 return csv.toJSON();
             }).then(json => {
-                document.getElementById('json').appendChild(renderjson(json));
+                if (jsonDisplayer.firstChild)
+                    jsonDisplayer.removeChild(jsonDisplayer.firstChild);
+                jsonDisplayer.appendChild(renderjson(json));
                 downloads.json = 'data:text/json;charset=utf-8,' + JSON.stringify(json);
                 return csv.toXML();
             }).then(xml => {
                 downloads.xml = 'data:text/xml;charset=utf-8,' + xml;
-                document.querySelector('#xml').firstChild.innerHTML = xml;
-                document.querySelector('.tab-csv[data-tab="table"]').click();
-                document.querySelector('.tab-result[data-tab="json"]').click();
+                document.querySelector('#xml').firstChild.textContent = xml;
+                document.querySelector('#tab-table').click();
+                document.querySelector('#tab-json').click();
             });
 
             btnDownload.style.display = '';
@@ -183,11 +194,16 @@ document.getElementById('file').addEventListener('change', function (ev) {
         reader.readAsText(file);
     } else {
         fileSelector.classList.add('is-danger');
-        fileError.style.display = '';    
+        fileError.style.display = '';
+        jsonDisplayer.removeChild(jsonDisplayer.firstChild);
+        csvTabs.forEach(e => e.classList.remove('is-active'));
+        resultTabs.forEach(e => e.classList.remove('is-active'));
+        document.querySelectorAll('.tab-content').forEach(e => e.style.display = 'none');
+        csvDisplay = resultDisplay = false;
     }
 });
 
-document.querySelectorAll('.tab-csv').forEach(e => {
+csvTabs.forEach(e => {
     e.addEventListener('click', (ev) => {
         const tab = ev.currentTarget;
         if (csv !== null) {
@@ -195,7 +211,7 @@ document.querySelectorAll('.tab-csv').forEach(e => {
                 document.querySelector(`#${tab.dataset.tab}`).style.display = '';
                 if (csvDisplay) {
                     document.querySelector(`#${csvDisplay}`).style.display = 'none';
-                    document.querySelector(`.tab-csv[data-tab="${csvDisplay}"]`).classList.remove('is-active');
+                    document.querySelector(`#tab-${csvDisplay}`).classList.remove('is-active');
                 }
                 tab.classList.add('is-active');
                 csvDisplay = tab.dataset.tab;
@@ -204,7 +220,7 @@ document.querySelectorAll('.tab-csv').forEach(e => {
     });
 });
 
-document.querySelectorAll('.tab-result').forEach(e => {
+resultTabs.forEach(e => {
     e.addEventListener('click', (ev) => {
         const tab = ev.currentTarget;
         if (window.csv !== null) {
@@ -214,7 +230,7 @@ document.querySelectorAll('.tab-result').forEach(e => {
                 document.querySelector(`#${tab.dataset.tab}`).style.display = '';
                 if (resultDisplay) {
                     document.querySelector(`#${resultDisplay}`).style.display = 'none';
-                    document.querySelector(`.tab-result[data-tab="${resultDisplay}"]`).classList.remove('is-active');
+                    document.querySelector(`#tab-${resultDisplay}`).classList.remove('is-active');
                 }
                 tab.classList.add('is-active');
                 resultDisplay = tab.dataset.tab;
@@ -222,3 +238,23 @@ document.querySelectorAll('.tab-result').forEach(e => {
         }
     });
 });
+
+document.querySelector('#date').textContent = (function() {
+    const date = new Date();
+    let month = '';
+    switch (date.getMonth()) {
+    case 0: month = 'Enero'; break;
+    case 1: month = 'Febrero'; break;
+    case 2: month = 'Marzo'; break;
+    case 3: month = 'Abril'; break;
+    case 4: month = 'Mayo'; break;
+    case 5: month = 'Junio'; break;
+    case 6: month = 'Julio'; break;
+    case 7: month = 'Agosto'; break;
+    case 8: month = 'Septiembre'; break;
+    case 9: month = 'Octubre'; break;
+    case 10: month = 'Noviembre'; break;
+    case 11: month = 'Diciembre'; break;
+    }
+    return date.getDate() + ' de ' + month + ' de ' + date.getFullYear();
+})();
