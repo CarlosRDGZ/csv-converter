@@ -126,8 +126,20 @@ class CSV {
                 let data = '';
                 let index = start;
                 if (this.data[start] === '"') {
-                    while (this.data[index] !== '"' && this.data[index] !== undefined) {
-                        data += this.data[index++];
+                    index++;
+                    let endOfSrting = false;
+                    while (!endOfSrting && this.data[index] !== undefined) {
+                        if (this.data[index] !== '"')
+                            data += this.data[index++];
+                        else {
+                            if (this.data[index + 1] === '"') {
+                                data += this.data[index];
+                                index += 2;
+                            } else {
+                                endOfSrting = true;
+                                index++;
+                            }
+                        }
                     }
                     values.push(data);
                     if (/\r|\n/.test(this.data[++index]) || this.data[index] === undefined) {
