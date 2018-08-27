@@ -1,0 +1,44 @@
+<table>
+	<row>
+		<make-d>BMW</make-d>
+		<odel>R1150RS</odel>
+		<year>2004</year>
+		<mileage>14274</mileage>
+	</row>
+	<row>
+		<make-d>Kawasaki</make-d>
+		<odel>GPz1100</odel>
+		<year>1996</year>
+		<mileage>60234</mileage>
+	</row>
+	<row>
+		<make-d>Ducati</make-d>
+		<odel>ST2</odel>
+		<year>1997</year>
+		<mileage>24000</mileage>
+	</row>
+	<row>
+		<make-d>Moto Guzzi</make-d>
+		<odel>LeMans</odel>
+		<year>2001</year>
+		<mileage>12393</mileage>
+	</row>
+	<row>
+		<make-d>BMW</make-d>
+		<odel>R1150R</odel>
+		<year>2002</year>
+		<mileage>17439</mileage>
+	</row>
+	<row>
+		<make-d>Ducati</make-d>
+		<odel>Monster</odel>
+		<year>2000</year>
+		<mileage>15682</mileage>
+	</row>
+	<row>
+		<make-d>Aprilia</make-d>
+		<odel>Futura</odel>
+		<year>2001</year>
+		<mileage>17320</mileage>
+	</row>
+</table>

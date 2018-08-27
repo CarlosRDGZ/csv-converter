@@ -13,6 +13,8 @@ const downloads = {
     xml: ''
 };
 
+const NL = navigator.platform.indexOf('Win') !== - 1 ? '\r\n' : '\n';
+
 class CSV {
     constructor(str, hasHeader) {
         this.data = str;
@@ -82,13 +84,16 @@ class CSV {
         return new Promise(function (resolve, reject) {
             if (self.data.length > 0) {
                 self.fields().then(function(props) {
-                    resolve('<table>' +
+                    props = props.map(prop => prop.replace(/\s/g, '-'));
+                    props = props.map(prop => prop.replace(/\"/g, ''));
+                    props = props.map(prop => prop.replace(/\'/g, ''));
+                    resolve('<table>' + NL +
                         self.matrix.map(row => {
-                            return '<row>' +
+                            return '\t<row>' + NL +
                                 row.map((v, i) => {
-                                    return '<' + props[i] + '>' + v + '</' + props[i] + '>';
+                                    return '\t\t<' + props[i] + '>' + v + '</' + props[i] + '>' + NL;
                                 }).join('') +
-                            '</row>';
+                            '\t</row>' + NL;
                         }).join('') +
                     '</table>');
                 });
